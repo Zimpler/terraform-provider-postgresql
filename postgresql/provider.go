@@ -1,12 +1,16 @@
 package postgresql
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/blang/semver"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+
+	awsConfig "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/feature/rds/auth"
 )
 
 const (
@@ -59,6 +63,14 @@ func Provider() terraform.ResourceProvider {
 				Description: "Password to be used if the PostgreSQL server demands password authentication",
 				Sensitive:   true,
 			},
+
+			"aws_rds_iam_auth": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Description: "Use rds_iam instead of password authentication " +
+					"(see: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html)",
+			},
+
 			// Conection username can be different than database username with user name mapas (e.g.: in Azure)
 			// See https://www.postgresql.org/docs/current/auth-username-maps.html
 			"database_username": {
@@ -171,13 +183,33 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	versionStr := d.Get("expected_version").(string)
 	version, _ := semver.ParseTolerant(versionStr)
 
-	println("loading config")
+	ctx := context.Background()
+	awsConfig, err := awsConfig.LoadDefaultConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	host := d.Get("host").(string)
+	port := d.Get("port").(int)
+	username := d.Get("username").(string)
+
+	var password string
+	if d.Get("aws_rds_iam_auth").(bool) {
+		endpoint := fmt.Sprintf("%s:%d", host, port)
+		password, err = auth.BuildAuthToken(ctx, endpoint, awsConfig.Region, username, awsConfig.Credentials)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		password = d.Get("password").(string)
+	}
+
 	config := Config{
 		Scheme:            d.Get("scheme").(string),
-		Host:              d.Get("host").(string),
-		Port:              d.Get("port").(int),
-		Username:          d.Get("username").(string),
-		Password:          d.Get("password").(string),
+		Host:              host,
+		Port:              port,
+		Username:          username,
+		Password:          password,
 		DatabaseUsername:  d.Get("database_username").(string),
 		Superuser:         d.Get("superuser").(bool),
 		SSLMode:           sslMode,
