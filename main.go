@@ -6,7 +6,6 @@ import (
 )
 
 func main() {
-	println("loading main")
 	plugin.Serve(&plugin.ServeOpts{
 		ProviderFunc: postgresql.Provider})
 }
