@@ -171,6 +171,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	versionStr := d.Get("expected_version").(string)
 	version, _ := semver.ParseTolerant(versionStr)
 
+	println("loading config")
 	config := Config{
 		Scheme:            d.Get("scheme").(string),
 		Host:              d.Get("host").(string),
