@@ -1,6 +1,8 @@
 Terraform Provider for PostgreSQL
 =================================
 
+This is a fork from https://github.com/cyrilgdn/terraform-provider-postgresql that adds support for IAM authentication for AWS RDS.
+
 This provider allows to manage with Terraform [Postgresql](https://www.postgresql.org/) objects like databases, extensions, roles, etc..
 
 It's published on the [Terraform registry](https://registry.terraform.io/providers/cyrilgdn/postgresql/latest/docs).
@@ -58,7 +60,7 @@ $ make test
 
 In order to run the full suite of Acceptance tests, run `make testacc`.
 
-*Note:* 
+*Note:*
 - Acceptance tests create real resources, and often cost money to run.
 - If ran locally `docker-compose` needs to be in the `$PATH`
 
@@ -69,7 +71,7 @@ $ make testacc
 In order to manually run some Acceptance test locally, run the following commands:
 ```sh
 # spins up a local docker postgres container
-make testacc_setup 
+make testacc_setup
 
 # Load the needed environment variables for the tests
 source tests/env.sh
@@ -78,5 +80,5 @@ source tests/env.sh
 TF_LOG=INFO go test -v ./postgresql -run ^TestAccPostgresqlRole_Basic$
 
 # cleans the env and tears down the postgres container
-make testacc_cleanup 
+make testacc_cleanup
 ```
