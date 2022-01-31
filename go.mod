@@ -3,6 +3,8 @@ module github.com/terraform-providers/terraform-provider-postgresql
 go 1.17
 
 require (
+	github.com/aws/aws-sdk-go-v2/config v1.8.0
+	github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.1.6
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.10.1
 	github.com/lib/pq v1.9.0
@@ -17,6 +19,7 @@ require (
 	github.com/agext/levenshtein v1.2.2 // indirect
 	github.com/apparentlymart/go-textseg v1.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.9.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
